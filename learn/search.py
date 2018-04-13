@@ -9,7 +9,14 @@ def add_to_index(index, keyword, url):
     index.append([keyword, [url]])
 
 
-add_to_index(index, 'udacity', 'http://udacity.com')
-add_to_index(index, 'computing', 'http://acm.org')
-add_to_index(index, 'udacity', 'http://npr.org')
-print(index)
+def add_page_to_index(index, url, content):
+    words = content.split(' ')
+    for word in words:
+        add_to_index(index, word, url)
+
+
+def lookup(index, keyword):
+    for record in index:
+        if record[0] == keyword:
+            return record[1]
+    return []
