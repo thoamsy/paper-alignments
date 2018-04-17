@@ -4,26 +4,41 @@ import Search from './Search';
 class App extends Component {
   state = {
     searchValue: '',
+    response: '',
+    isSearching: false,
   };
 
   onInput = ({ target: { value } }) => {
     this.setState({ searchValue: value });
   };
-  onSearch = event => {
+  onSearch = async event => {
     event.preventDefault();
-    fetch(`/search?q=${this.state.searchValue}`).then(console.log);
+    this.setState({ isSearching: true });
+    try {
+      const txt = fetch(`/search?q=${this.state.searchValue}`).then(res =>
+        res.text(),
+      );
+      this.setState({
+        response: await txt,
+      });
+    } finally {
+      this.setState({ isSearching: false });
+    }
   };
 
   render() {
+    const { response, searchValue, isSearching } = this.state;
     return (
       <div className="section">
         <div className="container">
           <Search
-            vaule={this.state.searchValue}
+            vaule={searchValue}
             onChange={this.onInput}
             onSubmit={this.onSearch}
+            isSearching={isSearching}
           />
         </div>
+        <h1 className="title">{response}</h1>
       </div>
     );
   }

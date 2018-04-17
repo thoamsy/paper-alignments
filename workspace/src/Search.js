@@ -1,7 +1,8 @@
 import React from 'react';
+import cx from 'classnames';
 
-const Search = ({ onSubmit, value, onChange }) => (
-  <form action="" onSubmit={onSubmit}>
+const Search = ({ onSubmit, value, onChange, isSearching }) => (
+  <form action="/search" onSubmit={onSubmit}>
     <div className="field has-addons">
       <div className="control">
         <input
@@ -12,7 +13,11 @@ const Search = ({ onSubmit, value, onChange }) => (
         />
       </div>
       <div className="control">
-        <button className="button is-info">Search</button>
+        <button
+          className={cx('button', 'is-info', { 'is-loading': isSearching })}
+        >
+          Search
+        </button>
       </div>
     </div>
   </form>

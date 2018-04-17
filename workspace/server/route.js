@@ -6,7 +6,7 @@ const router = new Router();
 
 router.get('/search', async ctx => {
   // console.log('request', ctx.request);
-  const params = new URL('http://localhost' + ctx.request.url);
+  const params = new URL('http://localhost' + ctx.url);
   const q = params.searchParams.get('q');
   ctx.body = q;
 });
