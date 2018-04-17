@@ -1,5 +1,5 @@
 {
   "python.pythonPath": "/anaconda3/bin/python",
   "python.formatting.provider": "yapf",
-  "eslint.enable": false
+  "eslint.enable": true
 }
