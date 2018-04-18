@@ -2,6 +2,7 @@ require('isomorphic-fetch');
 const cheerio = require('cheerio');
 const { URL } = require('url');
 const { union } = require('lodash');
+const fetchRobot = require('./robot');
 
 const cache = {};
 const getPage = async url => {
@@ -44,13 +45,12 @@ const getAllLinks = ($, page) => {
     .get();
 };
 
-const isUdacity = url => {
-  url = new URL(url);
-  return url.hostname.includes('udacity');
-};
+const isUdacity = url => url.hostname.includes('udacity');
 
 const crawlWeb = async seed => {
   let tocrawl = [seed];
+  const disallow = await fetchRobot(seed);
+  console.log(disallow);
   const crawled = {};
   const graph = {};
   const index = {};
@@ -62,7 +62,12 @@ const crawlWeb = async seed => {
       addPageToIndex(index, page, $);
       const outlinks = getAllLinks($, page);
       graph[page] = outlinks;
-      tocrawl = union(tocrawl, outlinks).filter(isUdacity);
+      tocrawl = union(tocrawl, outlinks).filter(link => {
+        const url = new URL(link);
+        return (
+          isUdacity(url) && !disallow.some(ban => url.pathname.startsWith(ban))
+        );
+      });
       // console.log(tocrawl);
       crawled[page] = true;
     }
@@ -70,6 +75,5 @@ const crawlWeb = async seed => {
 };
 
 const bulma = 'https://bulma.io/documentation/form/general/';
-crawlWeb('https://www.udacity.com');
-
+// crawlWeb('https://www.udacity.com');
 // console.log(new URL(bulma));
