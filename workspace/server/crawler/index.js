@@ -1,5 +1,6 @@
 require('isomorphic-fetch');
 const cheerio = require('cheerio');
+const { URL } = require('url');
 const { union } = require('lodash');
 
 const cache = {};
@@ -25,11 +26,27 @@ const addPageToIndex = (index, url, $) => {
   });
 };
 
-const getAllLinks = $ => {
-  // fetch 只能抓去绝对路由的 URL, 所以必须开头是 http 才行
-  return $('a[href^=http]')
-    .map((_, element) => $(element).attr('href'))
+const getAllLinks = ($, page) => {
+  const { origin } = new URL(page);
+  return $('a[href]')
+    .map((_, element) => {
+      const href = $(element).attr('href');
+      try {
+        new URL(href);
+      } catch (err) {
+        if (href[0] === '/') {
+          return `${origin}${href}`;
+        }
+        return `${origin}/${href}`;
+      }
+      return href;
+    })
     .get();
+};
+
+const isUdacity = url => {
+  url = new URL(url);
+  return url.hostname.includes('udacity');
 };
 
 const crawlWeb = async seed => {
@@ -43,12 +60,16 @@ const crawlWeb = async seed => {
     if (!crawled[page]) {
       const $ = await getPage(page);
       addPageToIndex(index, page, $);
-      const outlinks = getAllLinks($);
+      const outlinks = getAllLinks($, page);
       graph[page] = outlinks;
-      tocrawl = union(tocrawl, outlinks);
+      tocrawl = union(tocrawl, outlinks).filter(isUdacity);
+      // console.log(tocrawl);
       crawled[page] = true;
     }
   }
 };
 
-crawlWeb('https://bulma.io/documentation/form/general/');
+const bulma = 'https://bulma.io/documentation/form/general/';
+crawlWeb('https://www.udacity.com');
+
+// console.log(new URL(bulma));
