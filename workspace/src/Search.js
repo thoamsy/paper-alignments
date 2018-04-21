@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 
 const Search = ({ onSubmit, value, onChange, isSearching }) => (
-  <form action="/search" onSubmit={onSubmit}>
+  <form action="/search" onSubmit={onSubmit} className="form">
     <div className="field has-addons">
       <div className="control">
         <input

@@ -30,7 +30,7 @@ class App extends Component {
     const { response, searchValue, isSearching } = this.state;
     return (
       <div className="section">
-        <div className="container">
+        <div className="container is-fluid">
           <Search
             vaule={searchValue}
             onChange={this.onInput}
