@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { promisify, print } from 'util';
+import { promisify } from 'util';
 import Router from 'koa-router';
-// import { renderToString } from 'react-dom/server'
 import { URL } from 'url';
 
 const readFile = promisify(fs.readFile);
@@ -21,10 +20,13 @@ router.get('/search', async ctx => {
       const txt = await readFile(filePath, {
         encoding: 'utf-8',
       });
-      index = JSON.parse(txt);
+      index = JSON.parse(txt).map(question => ({
+        ...question,
+        title: question.title.toLowerCase(),
+      }));
     }
 
-    const search = index.filter(question => question.title.includes(q));
+    const search = index.filter(({ title }) => title.includes(q.toLowerCase()));
     if (!search.length) {
       ctx.body = 'Nothing search';
       return;
@@ -32,7 +34,7 @@ router.get('/search', async ctx => {
 
     ctx.body = JSON.stringify(search);
   } catch (err) {
-    console.log('file not found');
+    console.log(err);
     ctx.body = 'Bad!';
     ctx.status = 404;
   }

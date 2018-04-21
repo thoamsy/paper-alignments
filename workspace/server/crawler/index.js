@@ -1,4 +1,4 @@
-require('isomorphic-fetch');
+const axios = require('axios');
 const cheerio = require('cheerio');
 const { URL } = require('url');
 const { union } = require('lodash');
@@ -9,7 +9,7 @@ const getPage = async url => {
   if (cache[url]) return cache[url];
   console.log(`Page not in cache: ${url}`);
   try {
-    const html = await fetch(url).then(res => res.text());
+    const html = await axios.get(url, { responseType: 'txt' });
     return cheerio.load(html);
   } catch (err) {
     console.log(err);

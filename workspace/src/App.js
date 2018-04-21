@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import Search from './Search';
 
 class App extends Component {
@@ -15,11 +16,17 @@ class App extends Component {
     event.preventDefault();
     this.setState({ isSearching: true });
     try {
-      const txt = fetch(`/search?q=${this.state.searchValue}`).then(res =>
-        res.text(),
-      );
+      const { data } = await axios.get('/search', {
+        params: {
+          q: this.state.searchValue,
+        },
+      });
+
+      const response = Array.isArray(data)
+        ? data.map(question => question.title).join('\n')
+        : data;
       this.setState({
-        response: await txt,
+        response,
       });
     } finally {
       this.setState({ isSearching: false });
@@ -37,8 +44,11 @@ class App extends Component {
             onSubmit={this.onSearch}
             isSearching={isSearching}
           />
+          <hr />
+          <div className="content">
+            <p>{response}</p>
+          </div>
         </div>
-        <h1 className="title">{response}</h1>
       </div>
     );
   }
