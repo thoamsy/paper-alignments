@@ -22,11 +22,8 @@ class App extends Component {
         },
       });
 
-      const response = Array.isArray(data)
-        ? data.map(question => question.title).join('\n')
-        : data;
       this.setState({
-        response,
+        response: data,
       });
     } finally {
       this.setState({ isSearching: false });
@@ -46,7 +43,20 @@ class App extends Component {
           />
           <hr />
           <div className="content">
-            <p>{response}</p>
+            {Array.isArray(response) ? (
+              <ul>
+                {response.map(result => (
+                  <article className="message is-link" key={result}>
+                    <header className="message-header">
+                      <a href={result}>{result}</a>
+                    </header>
+                    <div className="message-body">You got me!!!</div>
+                  </article>
+                ))}
+              </ul>
+            ) : (
+              <p>Nothing Search.</p>
+            )}
           </div>
         </div>
       </div>
