@@ -3,3 +3,6 @@ DaveDaveFind/
 *.latex
 *.pdf
 .DS_Store
+package.json
+yarn.lock
+node_modules/
