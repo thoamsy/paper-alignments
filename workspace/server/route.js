@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 import Router from 'koa-router';
+import cheerio from 'cheerio';
 import {
   sortWith,
   map,
@@ -11,11 +12,12 @@ import {
   pipe,
   tap,
   ifElse,
-  is,
+  length,
   reduce,
-  intersection,
+  union,
 } from 'ramda';
 import { URL } from 'url';
+import axios from 'axios';
 
 const readFile = promisify(fs.readFile);
 
@@ -46,13 +48,14 @@ router.get('/search', async ctx => {
       stopwords = new Set(stopwords);
     }
 
-    const [first, ...less] = q.split(' ').filter(word => !stopwords.has(word));
+    const search = q.split(' ').filter(word => !stopwords.has(word));
+    console.log(search);
 
-    console.log(index[first], less);
     const sortSearchResult = pipe(
-      tap(console.log),
-      reduce((allUrl, word) => intersection(allUrl, index[word]), index[first]),
-      tap(console.log),
+      reduce(
+        (allUrl, word) => union(allUrl, index[word] || []),
+        index[search[0]] || [],
+      ),
       map(url => ({
         url,
         rank: rank[url],
@@ -61,12 +64,13 @@ router.get('/search', async ctx => {
       tap(console.log),
       pluck('url'),
     );
-    const getResult = ifElse(
-      is(Array),
-      sortSearchResult,
-      () => 'Nothing Search',
-    );
-    ctx.body = getResult(less);
+    const getResult = ifElse(length, sortSearchResult, () => 'Nothing Search');
+    const result = getResult(search);
+
+    ctx.body = {
+      urls: result,
+      preload: await reload(result),
+    };
   } catch (err) {
     console.log(err);
     ctx.body = 'Bad!';
@@ -74,4 +78,27 @@ router.get('/search', async ctx => {
   }
 });
 
+async function reload(links) {
+  try {
+    const htmls = links.slice(0, 5).map(link => {
+      if (!link.startsWith('http')) {
+        link = 'https://stackoverflow.com' + link;
+      }
+      return axios.get(link, { responseType: 'text' }).then(prop('data'));
+    });
+
+    const content = [];
+    for (const html of htmls) {
+      const $ = cheerio.load(await html);
+      const text = $(
+        '.container #mainbar .question .postcell .post-text',
+      ).html();
+      content.push(text);
+    }
+    return content;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+}
 export default router;
