@@ -20,6 +20,7 @@ import { URL } from 'url';
 import axios from 'axios';
 
 const readFile = promisify(fs.readFile);
+const cache = new Map();
 
 const router = new Router();
 const indexFilePath = path.resolve(__dirname, '../db/index.json');
@@ -80,25 +81,31 @@ router.get('/search', async ctx => {
 
 async function reload(links) {
   try {
-    const htmls = links.slice(0, 5).map(link => {
+    const texts = links.slice(0, 5).map(link => {
       if (!link.startsWith('http')) {
         link = 'https://stackoverflow.com' + link;
       }
-      return axios.get(link, { responseType: 'text' }).then(prop('data'));
+      return (
+        cache.get(link) ||
+        axios.get(link, { responseType: 'text' }).then(prop('data'))
+      );
     });
 
-    const content = [];
-    for (const html of htmls) {
-      const $ = cheerio.load(await html);
-      const text = $(
+    return texts.reduce(async (preload, text, i) => {
+      const $ = cheerio.load(await text);
+      const html = $(
         '.container #mainbar .question .postcell .post-text',
       ).html();
-      content.push(text);
-    }
-    return content;
+      const tags = $('.container #mainbar .question .postcell .post-taglist')
+        .text()
+        .trim()
+        .split(' ');
+      cache.has(links[i]) || cache.set(links[i], text);
+      return (await preload).concat({ html, tags });
+    }, []);
   } catch (err) {
     console.log(err);
-    return [];
+    return Array(5).fill('读取网站失败, 再试一次吧👀');
   }
 }
 export default router;
