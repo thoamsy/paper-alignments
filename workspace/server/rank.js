@@ -34,13 +34,8 @@ function computeRanks(graph) {
   const file = await readFile(path.resolve(__dirname, '../db/graph.json'), {
     encoding: 'utf8',
   });
-  const json = JSON.parse(file);
+  const graph = JSON.parse(file);
 
-  const graph = json.reduce((graph, node) => {
-    const [page, links] = Object.entries(node)[0];
-    graph[page] = links;
-    return graph;
-  }, {});
   const ranks = computeRanks(graph);
   fs.writeFile(
     path.resolve(__dirname, '../db/rank.json'),
