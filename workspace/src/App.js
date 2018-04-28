@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Search from './Search';
+import Result from './Result';
 
 class App extends Component {
   state = {
@@ -29,11 +30,6 @@ class App extends Component {
     }
   };
 
-  parseTitleWithUrl(url) {
-    const lastSlash = url.lastIndexOf('/');
-    return url.slice(lastSlash + 1).replace(/-/g, ' ');
-  }
-
   render() {
     const { urls, searchValue, isSearching, preload } = this.state;
     return (
@@ -50,31 +46,8 @@ class App extends Component {
             <div className="content">
               {Array.isArray(urls) ? (
                 <ul>
-                  {urls.map((result, index) => (
-                    <article className="card" key={result}>
-                      <header className="card-header">
-                        <a
-                          href={result}
-                          className="card-header-title"
-                          style={{ textTransform: 'capitalize' }}
-                        >
-                          {this.parseTitleWithUrl(result)}
-                        </a>
-                      </header>
-                      <div className="card-content">
-                        <div
-                          className="content has-text-left"
-                          dangerouslySetInnerHTML={{
-                            __html: preload[index].replace(
-                              new RegExp('<style>[^/]+/>', 'gi'),
-                              '',
-                            ),
-                          }}
-                        >
-                          {}
-                        </div>
-                      </div>
-                    </article>
+                  {urls.map((url, index) => (
+                    <Result key={url} {...preload[index]} url={url} />
                   ))}
                 </ul>
               ) : (
