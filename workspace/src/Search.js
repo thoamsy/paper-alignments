@@ -14,11 +14,13 @@ const Search = ({ onSubmit, value, onChange, isSearching }) => (
       </div>
       <div className="control">
         <button
-          className={cx('is-large', 'button', 'is-info', {
+          className={cx('is-large', 'button', 'is-gray', {
             'is-loading': isSearching,
           })}
         >
-          Search
+          <span role="img" aria-label="search">
+            🔍
+          </span>
         </button>
       </div>
     </div>

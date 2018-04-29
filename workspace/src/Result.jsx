@@ -9,36 +9,54 @@ function parseTagToUrl(tag) {
 }
 const Result = ({ url, html, tags }) => (
   <article className="card" key={url} style={{ marginTop: 20 }}>
-    <header className="card-header">
+    <header className="card-header" style={{ flexDirection: 'column' }}>
       <a
         href={url}
         target="_blank"
         className="card-header-title"
-        style={{ textTransform: 'capitalize', color: 'hsl(204, 86%, 53%)' }}
+        style={{
+          textTransform: 'capitalize',
+          color: 'hsl(204, 86%, 53%)',
+          fontSize: 18,
+          paddingBottom: 0,
+        }}
       >
         {parseTitleWithUrl(url)}
       </a>
-    </header>
-    <div className="card-content">
-      <div
-        className="content has-text-left"
-        dangerouslySetInnerHTML={{
-          __html: html.replace(new RegExp('<style>[^/]+/>', 'gi'), ''),
+      <p
+        className="card-header-title"
+        style={{
+          fontSize: 13,
+          color: '#006621',
+          paddingTop: 0,
+          fontWeight: 'normal',
         }}
-      />
-      <div className="tags">
-        {tags.map(tag => (
-          <a
-            target="_blank"
-            className="tag is-info"
-            key={tag}
-            href={parseTagToUrl(tag)}
-          >
-            {tag}
-          </a>
-        ))}
+      >
+        {url}
+      </p>
+    </header>
+    {html && (
+      <div className="card-content">
+        <div
+          className="content has-text-left"
+          dangerouslySetInnerHTML={{
+            __html: html,
+          }}
+        />
+        <div className="tags">
+          {tags.map(tag => (
+            <a
+              target="_blank"
+              className="tag is-info"
+              key={tag}
+              href={parseTagToUrl(tag)}
+            >
+              {tag}
+            </a>
+          ))}
+        </div>
       </div>
-    </div>
+    )}
   </article>
 );
 

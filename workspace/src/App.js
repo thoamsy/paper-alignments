@@ -44,12 +44,10 @@ class App extends Component {
             />
             <hr />
             <div className="content">
-              {Array.isArray(urls) ? (
-                <ul>
-                  {urls.map((url, index) => (
-                    <Result key={url} {...preload[index]} url={url} />
-                  ))}
-                </ul>
+              {Array.isArray(urls) && urls.length ? (
+                urls.map((url, index) => (
+                  <Result key={url} {...preload[index]} url={url} />
+                ))
               ) : (
                 <p>Nothing Search.</p>
               )}

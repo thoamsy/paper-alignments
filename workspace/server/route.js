@@ -31,7 +31,6 @@ let rank = null;
 let stopwords = null;
 
 router.get('/search', async ctx => {
-  // console.log('request', ctx.request);
   const params = new URL('http://localhost' + ctx.url);
   const q = params.searchParams
     .get('q')
@@ -50,7 +49,6 @@ router.get('/search', async ctx => {
     }
 
     const search = q.split(' ').filter(word => !stopwords.has(word));
-    console.log(search);
 
     const sortSearchResult = pipe(
       reduce(
@@ -105,7 +103,10 @@ async function reload(links) {
     }, []);
   } catch (err) {
     console.log(err);
-    return Array(5).fill('读取网站失败, 再试一次吧👀');
+    return Array(5).fill({
+      html: '读取网站失败, 再试一次吧👀',
+      tags: ['network'],
+    });
   }
 }
 export default router;
