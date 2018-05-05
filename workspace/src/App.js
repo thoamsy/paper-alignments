@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Search from './Search';
 import Result from './Result';
+import './style.css';
 
 class App extends Component {
   state = {
@@ -34,8 +35,13 @@ class App extends Component {
     const { urls, searchValue, isSearching, preload } = this.state;
     return (
       <div className="hero is-fullheight">
+        {typeof preload === 'string' && (
+          <div className="notification is-warning">
+            服务器的网络条件不佳, 将仅仅展示 URL
+          </div>
+        )}
         <div className="hero-body">
-          <div className="container has-text-centered">
+          <div className="container has-text-centered is-fluid">
             <Search
               vaule={searchValue}
               onChange={this.onInput}

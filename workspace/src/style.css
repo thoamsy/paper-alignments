@@ -1,0 +1,29 @@
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+.notification {
+  animation: fadein 3s ease-in forwards;
+  will-change: opacity;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+.field.has-addons.has-addons-centered {
+  position: sticky;
+  top: 20px;
+  left: 10px;
+}
